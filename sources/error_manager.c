@@ -1,27 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   error_manager.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gsmets <gsmets@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/02/10 17:20:40 by gsmets            #+#    #+#             */
-/*   Updated: 2021/02/15 20:29:47 by gsmets           ###   ########.fr       */
+/*   Created: 2021/02/10 18:31:56 by gsmets            #+#    #+#             */
+/*   Updated: 2021/02/11 17:22:50 by gsmets           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int		main(int argc, char **argv)
+int	write_error(char *str)
 {
-	t_rules	rules;
-	int		ret;
+	int len;
 
-	if (argc != 5 && argc != 6)
-		return (write_error("Wrong amount of arguments"));
-	if ((ret = init_all(&rules, argv)))
-		return (error_manager(ret));
-	if (launcher(&rules))
-		return (write_error("There was an error creating the threads"));
-	return (0);
+	len = 0;
+	while (str[len])
+		len++;
+	write(2, "Error: ", 7);
+	write(2, str, len);
+	write(2, "\n", 1);
+	return (1);
+}
+
+int	error_manager(int error)
+{
+	if (error == 1)
+		return (write_error("At least one wrong argument"));
+	if (error == 2)
+		return (write_error("Fatal error when intializing mutex"));
+	return (1);
 }

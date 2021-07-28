@@ -1,11 +1,11 @@
 #SETUP
 NAME		= philo
 CC			= gcc
-CFLAGS		= -Wall -Wextra -Werror
+CFLAGS		= -Wall -Wextra -Werror #-pthread
 RM			= rm -f
 
 #FILES
-FLS			= $(NAME).c
+FLS			= $(NAME).c init.c launcher.c error_manager.c utils.c
 SRCS_DIR	= sources/
 HEADER		= $(SRCS_DIR)$(NAME).h
 SRCS		= $(addprefix $(SRCS_DIR), $(FLS))
