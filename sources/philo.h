@@ -65,6 +65,5 @@ void					smart_sleep(long long time, t_rules *rules);
 */
 
 int						launcher(t_rules *rules);
-void					exit_launcher(t_rules *rules, t_philosopher *philos);
 
 #endif

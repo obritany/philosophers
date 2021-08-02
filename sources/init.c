@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   init.c                                             :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: gsmets <gsmets@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/02/10 18:47:47 by gsmets            #+#    #+#             */
-/*   Updated: 2021/02/22 10:14:34 by gsmets           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "philo.h"
 
 int	init_mutex(t_rules *rules)
@@ -17,11 +5,9 @@ int	init_mutex(t_rules *rules)
 	int i;
 
 	i = rules->nb_philo;
-	while (--i >= 0)
-	{
+	while (i-- > 0)
 		if (pthread_mutex_init(&(rules->forks[i]), NULL))
 			return (1);
-	}
 	if (pthread_mutex_init(&(rules->writing), NULL))
 		return (1);
 	if (pthread_mutex_init(&(rules->meal_check), NULL))
@@ -34,7 +20,7 @@ int	init_philosophers(t_rules *rules)
 	int i;
 
 	i = rules->nb_philo;
-	while (--i >= 0)
+	while (i-- > 0)
 	{
 		rules->philosophers[i].id = i;
 		rules->philosophers[i].x_ate = 0;
@@ -54,8 +40,8 @@ int	init_all(t_rules *rules, char **argv)
 	rules->time_sleep = ft_atoi(argv[4]);
 	rules->all_ate = 0;
 	rules->dieded = 0;
-	if (rules->nb_philo < 2 || rules->time_death < 0 || rules->time_eat < 0
-		|| rules->time_sleep < 0 || rules->nb_philo > 250)
+	if (rules->nb_philo < 2 || rules->time_death < 0 || rules->time_eat < 0 ||
+		rules->time_sleep < 0 || rules->nb_philo > 250)
 		return (1);
 	if (argv[5])
 	{
