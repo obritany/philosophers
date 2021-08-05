@@ -1,15 +1,15 @@
 #include "philo.h"
 
-int		main(int argc, char **argv)
+int		main(int argc, char *argv[])
 {
 	t_rules	rules;
 	int		ret;
 
-	if (argc != 5 && argc != 6)
-		return (write_error("Wrong amount of arguments"));
-	if ((ret = init_all(&rules, argv)))
-		return (error_manager(ret));
+	if (argc < 5 || argc > 6)
+		return (print_error(1));
+	if ((ret = setup(&rules, argv)))
+		return (print_error(ret));
 	if (launcher(&rules))
-		return (write_error("There was an error creating the threads"));
+		return (print_error(4));
 	return (0);
 }

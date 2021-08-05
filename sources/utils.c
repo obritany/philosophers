@@ -1,60 +1,63 @@
 #include "philo.h"
 
-int			ft_atoi(const char *str)
+int	ft_atoi(const char *str)
 {
-	long int	n;
-	int			sign;
+	unsigned long long	pre_max;
+	unsigned long long	rslt;
+	int	sign;
+	int	i;
 
-	n = 0;
+	pre_max = 922337203685477580;
+	rslt = 0;
 	sign = 1;
-	while ((*str <= 13 && *str >= 9) || *str == 32)
-		str++;
-	if (*str == '-')
-		return (-1);
-	else if (*str == '+')
-		str++;
-	while (*str)
+	i = 0;
+	while ((str[i] >= '\t' && str[i] <= '\r') || str[i] == ' ')
+		i++;
+	if (str[i] == '-' || str[i] == '+')
+		if (str[i++] == '-')
+			sign = -1;
+	while (str[i] >= '0' && str[i] <= '9')
 	{
-		if (*str >= '0' && *str <= '9')
-			n = n * 10 + (*str++ - '0');
-		else
-			return (-1);
+		if (sign == 1)
+			if (rslt > pre_max || (rslt == pre_max && str[i] > '7'))
+				return (-1);
+		if (sign == -1)
+			if (rslt > pre_max || (rslt == pre_max && str[i] > '8'))
+				return (0);
+		rslt = (rslt * 10) + (str[i++] - '0');
 	}
-	return ((int)(n * sign));
+	return (rslt * sign);
 }
 
-long long	timestamp(void)
+long long	millis(void)
 {
-	struct timeval	t;
+	struct timeval	time;
+	long long rslt;
 
-	gettimeofday(&t, NULL);
-	return ((t.tv_sec * 1000) + (t.tv_usec / 1000));
+	gettimeofday(&time, NULL);
+	rslt = time.tv_sec * 1000 + time.tv_usec / 1000;
+	return (rslt);
 }
 
-long long	time_diff(long long past, long long pres)
-{
-	return (pres - past);
-}
-
-void		smart_sleep(long long time, t_rules *rules)
+void	smart_sleep(t_rules *rules, long long time)
 {
 	long long i;
 
-	i = timestamp();
+	i = millis();
 	while (!(rules->dieded))
 	{
-		if (time_diff(i, timestamp()) >= time)
+		if ((millis() - i) >= time)
 			break ;
 		usleep(50);
 	}
 }
 
-void		action_print(t_rules *rules, int id, char *string)
+void	action_print(t_rules *rules, int id, char *string)
 {
 	pthread_mutex_lock(&(rules->writing));
 	if (!(rules->dieded))
 	{
-		printf("%lli ", timestamp() - rules->first_timestamp);
+		printf("%lli ", millis() - rules->first_timestamp);
 		printf("%i ", id + 1);
 		printf("%s\n", string);
 	}

@@ -5,7 +5,7 @@
 
 pthread_mutex_t	mutex;
 
-long long	timestamp(void)
+long long	millis(void)
 {
 	struct timeval	t;
 
@@ -36,7 +36,7 @@ int	main()
 	pthread_t id2;
 
 	printf("Hello!\n");
-	printf("Time: %lld\n", timestamp());
+	printf("Time: %lld\n", millis());
 
 	count = 5;
 	pthread_mutex_init(&mutex, NULL);

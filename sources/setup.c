@@ -1,6 +1,6 @@
 #include "philo.h"
 
-int	init_mutex(t_rules *rules)
+int	mutex_setup(t_rules *rules)
 {
 	int i;
 
@@ -15,7 +15,7 @@ int	init_mutex(t_rules *rules)
 	return (0);
 }
 
-int	init_philosophers(t_rules *rules)
+int	philo_setup(t_rules *rules)
 {
 	int i;
 
@@ -32,7 +32,7 @@ int	init_philosophers(t_rules *rules)
 	return (0);
 }
 
-int	init_all(t_rules *rules, char **argv)
+int	setup(t_rules *rules, char **argv)
 {
 	rules->nb_philo = ft_atoi(argv[1]);
 	rules->time_death = ft_atoi(argv[2]);
@@ -42,17 +42,17 @@ int	init_all(t_rules *rules, char **argv)
 	rules->dieded = 0;
 	if (rules->nb_philo < 2 || rules->time_death < 0 || rules->time_eat < 0 ||
 		rules->time_sleep < 0 || rules->nb_philo > 250)
-		return (1);
+		return (2);
 	if (argv[5])
 	{
 		rules->nb_eat = ft_atoi(argv[5]);
 		if (rules->nb_eat <= 0)
-			return (1);
+			return (2);
 	}
 	else
 		rules->nb_eat = -1;
-	if (init_mutex(rules))
-		return (2);
-	init_philosophers(rules);
+	if (mutex_setup(rules))
+		return (3);
+	philo_setup(rules);
 	return (0);
 }
