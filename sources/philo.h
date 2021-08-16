@@ -41,6 +41,6 @@ int			ft_atoi(const char *str);
 void		action_print(t_rules *rules, int id, char *string);
 long long	millis(void);
 void		smart_sleep(t_rules *rules, long long time);
-int			launcher(t_rules *rules);
+int			threads(t_rules *rules);
 
 #endif

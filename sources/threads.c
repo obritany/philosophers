@@ -43,7 +43,7 @@ void	*p_thread(void *void_philosopher)
 	return (NULL);
 }
 
-void	exit_launcher(t_rules *rules)
+void	wait_threads(t_rules *rules)
 {
 	int i;
 
@@ -85,7 +85,7 @@ void	death_checker(t_rules *rules)
 	}
 }
 
-int	launcher(t_rules *rules)
+int	threads(t_rules *rules)
 {
 	int	i;
 
@@ -99,6 +99,6 @@ int	launcher(t_rules *rules)
 		i++;
 	}
 	death_checker(rules);
-	exit_launcher(rules);
+	wait_threads(rules);
 	return (0);
 }

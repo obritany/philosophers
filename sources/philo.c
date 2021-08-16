@@ -9,7 +9,7 @@ int		main(int argc, char *argv[])
 		return (print_error(1));
 	if ((ret = setup(&rules, argv)))
 		return (print_error(ret));
-	if (launcher(&rules))
+	if (threads(&rules))
 		return (print_error(4));
 	return (0);
 }
