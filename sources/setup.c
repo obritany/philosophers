@@ -1,58 +1,70 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   setup.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: obritany <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/08/16 15:05:00 by obritany          #+#    #+#             */
+/*   Updated: 2021/08/16 15:05:02 by obritany         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
-int	mutex_setup(t_rules *rules)
+int	mutex_setup(t_data *data)
 {
-	int i;
+	int	i;
 
-	i = rules->nb_philo;
+	i = data->num_philos;
 	while (i-- > 0)
-		if (pthread_mutex_init(&(rules->forks[i]), NULL))
+		if (pthread_mutex_init(&(data->forks[i]), NULL))
 			return (1);
-	if (pthread_mutex_init(&(rules->writing), NULL))
+	if (pthread_mutex_init(&(data->printing), NULL))
 		return (1);
-	if (pthread_mutex_init(&(rules->meal_check), NULL))
+	if (pthread_mutex_init(&(data->check_meal), NULL))
 		return (1);
 	return (0);
 }
 
-int	philo_setup(t_rules *rules)
+int	philos_setup(t_data *data)
 {
-	int i;
+	int	i;
 
-	i = rules->nb_philo;
+	i = data->num_philos;
 	while (i-- > 0)
 	{
-		rules->philosophers[i].id = i;
-		rules->philosophers[i].x_ate = 0;
-		rules->philosophers[i].left_fork_id = i;
-		rules->philosophers[i].right_fork_id = (i + 1) % rules->nb_philo;
-		rules->philosophers[i].t_last_meal = 0;
-		rules->philosophers[i].rules = rules;
+		data->philos[i].id = i;
+		data->philos[i].meal_count = 0;
+		data->philos[i].left_fork = i;
+		data->philos[i].right_fork = (i + 1) % data->num_philos;
+		data->philos[i].last_meal_time = 0;
+		data->philos[i].data = data;
 	}
 	return (0);
 }
 
-int	setup(t_rules *rules, char **argv)
+int	setup(t_data *data, char **argv)
 {
-	rules->nb_philo = ft_atoi(argv[1]);
-	rules->time_death = ft_atoi(argv[2]);
-	rules->time_eat = ft_atoi(argv[3]);
-	rules->time_sleep = ft_atoi(argv[4]);
-	rules->all_ate = 0;
-	rules->dieded = 0;
-	if (rules->nb_philo < 2 || rules->time_death < 0 || rules->time_eat < 0 ||
-		rules->time_sleep < 0 || rules->nb_philo > 250)
+	data->num_philos = ft_atoi(argv[1]);
+	data->time_die = ft_atoi(argv[2]);
+	data->time_eat = ft_atoi(argv[3]);
+	data->time_sleep = ft_atoi(argv[4]);
+	data->meals_done = 0;
+	data->philo_died = 0;
+	if (data->num_philos < 2 || data->time_die < 0 || data->time_eat < 0
+		|| data->time_sleep < 0 || data->num_philos > 250)
 		return (2);
 	if (argv[5])
 	{
-		rules->nb_eat = ft_atoi(argv[5]);
-		if (rules->nb_eat <= 0)
+		data->num_meal = ft_atoi(argv[5]);
+		if (data->num_meal <= 0)
 			return (2);
 	}
 	else
-		rules->nb_eat = -1;
-	if (mutex_setup(rules))
+		data->num_meal = -1;
+	if (mutex_setup(data))
 		return (3);
-	philo_setup(rules);
+	philos_setup(data);
 	return (0);
 }

@@ -1,104 +1,117 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   threads.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: obritany <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/08/16 15:05:19 by obritany          #+#    #+#             */
+/*   Updated: 2021/08/16 15:05:21 by obritany         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
-void	philo_eats(t_philosopher *philo)
+void	philo_meal(t_philo *philo)
 {
-	t_rules *rules;
+	t_data	*data;
 
-	rules = philo->rules;
-	pthread_mutex_lock(&(rules->forks[philo->left_fork_id]));
-	action_print(rules, philo->id, "has taken a fork");
-	pthread_mutex_lock(&(rules->forks[philo->right_fork_id]));
-	action_print(rules, philo->id, "has taken a fork");
-	pthread_mutex_lock(&(rules->meal_check));
-	action_print(rules, philo->id, "is eating");
-	philo->t_last_meal = millis();
-	pthread_mutex_unlock(&(rules->meal_check));
-	smart_sleep(rules, rules->time_eat);
-	(philo->x_ate)++;
-	pthread_mutex_unlock(&(rules->forks[philo->left_fork_id]));
-	pthread_mutex_unlock(&(rules->forks[philo->right_fork_id]));
+	data = philo->data;
+	pthread_mutex_lock(&(data->forks[philo->left_fork]));
+	print_event(data, philo->id, "has taken a fork");
+	pthread_mutex_lock(&(data->forks[philo->right_fork]));
+	print_event(data, philo->id, "has taken a fork");
+	pthread_mutex_lock(&(data->check_meal));
+	print_event(data, philo->id, "is eating");
+	philo->last_meal_time = millis();
+	pthread_mutex_unlock(&(data->check_meal));
+	sleep_millis(data, data->time_eat);
+	(philo->meal_count)++;
+	pthread_mutex_unlock(&(data->forks[philo->left_fork]));
+	pthread_mutex_unlock(&(data->forks[philo->right_fork]));
 }
 
-void	*p_thread(void *void_philosopher)
+void	*philo_thread(void *void_philosopher)
 {
-	int				i;
-	t_philosopher	*philo;
-	t_rules			*rules;
+	int		i;
+	t_philo	*philo;
+	t_data	*data;
 
 	i = 0;
-	philo = (t_philosopher *)void_philosopher;
-	rules = philo->rules;
+	philo = (t_philo *)void_philosopher;
+	data = philo->data;
 	if (philo->id % 2)
 		usleep(15000);
-	while (!(rules->dieded))
+	while (!(data->philo_died))
 	{
-		philo_eats(philo);
-		if (rules->all_ate)
+		philo_meal(philo);
+		if (data->meals_done)
 			break ;
-		action_print(rules, philo->id, "is sleeping");
-		smart_sleep(rules, rules->time_sleep);
-		action_print(rules, philo->id, "is thinking");
+		print_event(data, philo->id, "is sleeping");
+		sleep_millis(data, data->time_sleep);
+		print_event(data, philo->id, "is thinking");
 		i++;
 	}
 	return (NULL);
 }
 
-void	wait_threads(t_rules *rules)
-{
-	int i;
-
-	i = -1;
-	while (++i < rules->nb_philo)
-		pthread_join(rules->philosophers[i].thread_id, NULL);
-	i = -1;
-	while (++i < rules->nb_philo)
-		pthread_mutex_destroy(&(rules->forks[i]));
-	pthread_mutex_destroy(&(rules->writing));
-}
-
-void	death_checker(t_rules *rules)
-{
-	int i;
-
-	while (!(rules->all_ate))
-	{
-		i = 0;
-		while (i < rules->nb_philo && !(rules->dieded))
-		{
-			pthread_mutex_lock(&(rules->meal_check));
-			if ((millis() - rules->philosophers[i].t_last_meal) > rules->time_death)
-			{
-				action_print(rules, i, "died");
-				rules->dieded = 1;
-			}
-			pthread_mutex_unlock(&(rules->meal_check));
-			usleep(100);
-			i++;
-		}
-		if (rules->dieded)
-			break ;
-		i = 0;
-		while (rules->nb_eat != -1 && i < rules->nb_philo && rules->philosophers[i].x_ate >= rules->nb_eat)
-			i++;
-		if (i == rules->nb_philo)
-			rules->all_ate = 1;
-	}
-}
-
-int	threads(t_rules *rules)
+void	wait_threads(t_data *data)
 {
 	int	i;
 
-	rules->first_timestamp = millis();
-	i = 0;
-	while (i < rules->nb_philo)
+	i = -1;
+	while (++i < data->num_philos)
+		pthread_join(data->philos[i].thread_id, NULL);
+	i = -1;
+	while (++i < data->num_philos)
+		pthread_mutex_destroy(&(data->forks[i]));
+	pthread_mutex_destroy(&(data->printing));
+}
+
+void	check_status(t_data *data)
+{
+	int	i;
+
+	while (!(data->meals_done))
 	{
-		if (pthread_create(&(rules->philosophers[i].thread_id), NULL, p_thread, &(rules->philosophers[i])))
-			return (1);
-		rules->philosophers[i].t_last_meal = millis();
+		i = -1;
+		while (++i < data->num_philos && !(data->philo_died))
+		{
+			pthread_mutex_lock(&(data->check_meal));
+			if ((millis() - data->philos[i].last_meal_time) > data->time_die)
+			{
+				print_event(data, i, "died");
+				data->philo_died = 1;
+			}
+			pthread_mutex_unlock(&(data->check_meal));
+			usleep(100);
+		}
+		if (data->philo_died)
+			break ;
+		i = 0;
+		while (data->num_meal != -1 && i < data->num_philos
+			&& data->philos[i].meal_count >= data->num_meal)
+			i++;
+		if (i == data->num_philos)
+			data->meals_done = 1;
+	}
+}
+
+int	threads(t_data *data)
+{
+	int	i;
+
+	data->start_millis = millis();
+	i = 0;
+	while (i < data->num_philos)
+	{
+		if (pthread_create(&(data->philos[i].thread_id), NULL,
+				philo_thread, &(data->philos[i])))
+			return (4);
+		data->philos[i].last_meal_time = millis();
 		i++;
 	}
-	death_checker(rules);
-	wait_threads(rules);
+	check_status(data);
+	wait_threads(data);
 	return (0);
 }

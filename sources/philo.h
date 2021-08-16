@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philo.h                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: obritany <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/08/16 15:04:43 by obritany          #+#    #+#             */
+/*   Updated: 2021/08/16 15:04:45 by obritany         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef PHILO_H
 # define PHILO_H
 
@@ -6,41 +18,40 @@
 # include <sys/time.h>
 # include <pthread.h>
 
-struct s_rules;
-
-typedef	struct			s_philosopher
+typedef struct s_philo
 {
-	int					id;
-	int					x_ate;
-	int					left_fork_id;
-	int					right_fork_id;
-	long long			t_last_meal;
-	struct s_rules		*rules;
 	pthread_t			thread_id;
-}						t_philosopher;
+	int					id;
+	int					left_fork;
+	int					right_fork;
+	int					meal_count;
+	long long			last_meal_time;
+	struct s_data		*data;
+}						t_philo;
 
-typedef struct			s_rules
+typedef struct s_data
 {
-	int					nb_philo;
-	int					time_death;
+	int					num_philos;
+	int					time_die;
 	int					time_eat;
 	int					time_sleep;
-	int					nb_eat;
-	int					dieded;
-	int					all_ate;
-	long long			first_timestamp;
-	pthread_mutex_t		meal_check;
-	pthread_mutex_t		forks[250];
-	pthread_mutex_t		writing;
-	t_philosopher		philosophers[250];
-}						t_rules;
+	int					num_meal;
+	int					philo_died;
+	int					meals_done;
+	long long			start_millis;
+	pthread_mutex_t		check_meal;
+	pthread_mutex_t		forks[300];
+	pthread_mutex_t		printing;
+	t_philo				philos[300];
+}						t_data;
 
-int			print_error(int error);
-int			setup(t_rules *rules, char **argv);
 int			ft_atoi(const char *str);
-void		action_print(t_rules *rules, int id, char *string);
+void		ft_putstr_fd(char *s, int fd);
+int			setup(t_data *data, char **argv);
+int			threads(t_data *data);
 long long	millis(void);
-void		smart_sleep(t_rules *rules, long long time);
-int			threads(t_rules *rules);
+void		sleep_millis(t_data *data, long long time);
+void		print_event(t_data *data, int id, char *string);
+int			print_error(int error);
 
 #endif

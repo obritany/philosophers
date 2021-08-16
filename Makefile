@@ -5,7 +5,7 @@ CFLAGS		= -Wall -Wextra -Werror #-pthread
 RM			= rm -f
 
 #FILES
-FLS			= $(NAME).c setup.c threads.c print_error.c functions.c
+FLS			= $(NAME).c setup.c threads.c functions.c utils.c
 SRCS_DIR	= sources/
 HEADER		= $(SRCS_DIR)$(NAME).h
 SRCS		= $(addprefix $(SRCS_DIR), $(FLS))

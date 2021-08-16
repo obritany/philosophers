@@ -1,66 +1,58 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   functions.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: obritany <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/08/16 15:04:30 by obritany          #+#    #+#             */
+/*   Updated: 2021/08/16 15:04:32 by obritany         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
-
-int	ft_atoi(const char *str)
-{
-	unsigned long long	pre_max;
-	unsigned long long	rslt;
-	int	sign;
-	int	i;
-
-	pre_max = 922337203685477580;
-	rslt = 0;
-	sign = 1;
-	i = 0;
-	while ((str[i] >= '\t' && str[i] <= '\r') || str[i] == ' ')
-		i++;
-	if (str[i] == '-' || str[i] == '+')
-		if (str[i++] == '-')
-			sign = -1;
-	while (str[i] >= '0' && str[i] <= '9')
-	{
-		if (sign == 1)
-			if (rslt > pre_max || (rslt == pre_max && str[i] > '7'))
-				return (-1);
-		if (sign == -1)
-			if (rslt > pre_max || (rslt == pre_max && str[i] > '8'))
-				return (0);
-		rslt = (rslt * 10) + (str[i++] - '0');
-	}
-	return (rslt * sign);
-}
 
 long long	millis(void)
 {
 	struct timeval	time;
-	long long rslt;
+	long long		rslt;
 
 	gettimeofday(&time, NULL);
 	rslt = time.tv_sec * 1000 + time.tv_usec / 1000;
 	return (rslt);
 }
 
-void	smart_sleep(t_rules *rules, long long time)
+void	sleep_millis(t_data *data, long long sleep_time)
 {
-	long long i;
+	long long	start;
 
-	i = millis();
-	while (!(rules->dieded))
+	start = millis();
+	while (!(data->philo_died))
 	{
-		if ((millis() - i) >= time)
+		if ((millis() - start) >= sleep_time)
 			break ;
 		usleep(50);
 	}
 }
 
-void	action_print(t_rules *rules, int id, char *string)
+void	print_event(t_data *data, int id, char *event)
 {
-	pthread_mutex_lock(&(rules->writing));
-	if (!(rules->dieded))
-	{
-		printf("%lli ", millis() - rules->first_timestamp);
-		printf("%i ", id + 1);
-		printf("%s\n", string);
-	}
-	pthread_mutex_unlock(&(rules->writing));
+	pthread_mutex_lock(&(data->printing));
+	if (!(data->philo_died))
+		printf("%lli %i %s\n", millis() - data->start_millis, id + 1, event);
+	pthread_mutex_unlock(&(data->printing));
 	return ;
+}
+
+int	print_error(int error)
+{
+	if (error == 1)
+		ft_putstr_fd("Error: Wrong number of arguments\n", 2);
+	if (error == 2)
+		ft_putstr_fd("Error: Wrong argument\n", 2);
+	if (error == 3)
+		ft_putstr_fd("Error: Mutex problem\n", 2);
+	if (error == 4)
+		ft_putstr_fd("Error: Thread problem\n", 2);
+	return (error);
 }
