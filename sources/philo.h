@@ -39,7 +39,7 @@ typedef struct s_data
 	int					philo_died;
 	int					meals_done;
 	long long			start_millis;
-	pthread_mutex_t		check_meal;
+	pthread_mutex_t		meal_state;
 	pthread_mutex_t		forks[300];
 	pthread_mutex_t		printing;
 	t_philo				philos[300];
@@ -50,7 +50,7 @@ void		ft_putstr_fd(char *s, int fd);
 int			setup(t_data *data, char **argv);
 int			threads(t_data *data);
 long long	millis(void);
-void		sleep_millis(t_data *data, long long time);
+void		msleep(t_data *data, long long time);
 void		print_event(t_data *data, int id, char *string);
 int			print_error(int error);
 

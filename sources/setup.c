@@ -22,7 +22,7 @@ int	mutex_setup(t_data *data)
 			return (1);
 	if (pthread_mutex_init(&(data->printing), NULL))
 		return (1);
-	if (pthread_mutex_init(&(data->check_meal), NULL))
+	if (pthread_mutex_init(&(data->meal_state), NULL))
 		return (1);
 	return (0);
 }

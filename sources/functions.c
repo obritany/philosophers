@@ -22,7 +22,7 @@ long long	millis(void)
 	return (rslt);
 }
 
-void	sleep_millis(t_data *data, long long sleep_time)
+void	msleep(t_data *data, long long sleep_time)
 {
 	long long	start;
 
@@ -31,7 +31,7 @@ void	sleep_millis(t_data *data, long long sleep_time)
 	{
 		if ((millis() - start) >= sleep_time)
 			break ;
-		usleep(50);
+		usleep(100);
 	}
 }
 
