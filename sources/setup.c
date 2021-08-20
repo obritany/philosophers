@@ -16,10 +16,13 @@ int	mutex_setup(t_data *data)
 {
 	int	i;
 
-	i = data->num_philos;
-	while (i-- > 0)
+	i = 0;
+	while (i < data->num_philos)
+	{
 		if (pthread_mutex_init(&(data->forks[i]), NULL))
 			return (1);
+		i++;
+	}
 	if (pthread_mutex_init(&(data->printing), NULL))
 		return (1);
 	if (pthread_mutex_init(&(data->meal_state), NULL))
@@ -31,8 +34,8 @@ int	philos_setup(t_data *data)
 {
 	int	i;
 
-	i = data->num_philos;
-	while (i-- > 0)
+	i = 0;
+	while (i < data->num_philos)
 	{
 		data->philos[i].id = i;
 		data->philos[i].meal_count = 0;
@@ -40,6 +43,7 @@ int	philos_setup(t_data *data)
 		data->philos[i].right_fork = (i + 1) % data->num_philos;
 		data->philos[i].last_meal_time = 0;
 		data->philos[i].data = data;
+		i++;
 	}
 	return (0);
 }
@@ -52,8 +56,8 @@ int	setup(t_data *data, char **argv)
 	data->time_sleep = ft_atoi(argv[4]);
 	data->meals_done = 0;
 	data->philo_died = 0;
-	if (data->num_philos < 2 || data->time_die < 0 || data->time_eat < 0
-		|| data->time_sleep < 0 || data->num_philos > 250)
+	if (data->num_philos < 1 || data->time_die < 0 || data->time_eat < 0
+		|| data->time_sleep < 0 || data->num_philos > 300)
 		return (2);
 	if (argv[5])
 	{

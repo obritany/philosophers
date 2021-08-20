@@ -31,25 +31,23 @@ void	philo_meal(t_philo *philo)
 	pthread_mutex_unlock(&(data->forks[philo->right_fork]));
 }
 
-void	*philo_thread(void *void_philosopher)
+void	*philo_thread(void *philo)
 {
 	int		i;
-	t_philo	*philo;
 	t_data	*data;
 
 	i = 0;
-	philo = (t_philo *)void_philosopher;
-	data = philo->data;
-	if (philo->id % 2)
+	data = ((t_philo *)philo)->data;
+	if (((t_philo *)philo)->id % 2)
 		usleep(10000);
 	while (!(data->philo_died))
 	{
-		philo_meal(philo);
+		philo_meal(((t_philo *)philo));
 		if (data->meals_done)
 			break ;
-		print_event(data, philo->id, "is sleeping");
+		print_event(data, ((t_philo *)philo)->id, "is sleeping");
 		msleep(data, data->time_sleep);
-		print_event(data, philo->id, "is thinking");
+		print_event(data, ((t_philo *)philo)->id, "is thinking");
 		i++;
 	}
 	return (NULL);
@@ -59,13 +57,20 @@ void	wait_threads(t_data *data)
 {
 	int	i;
 
-	i = -1;
-	while (++i < data->num_philos)
+	i = 0;
+	while (i < data->num_philos)
+	{
 		pthread_join(data->philos[i].thread_id, NULL);
-	i = -1;
+		i++;
+	}
+	i = 0;
 	while (++i < data->num_philos)
+	{
 		pthread_mutex_destroy(&(data->forks[i]));
+		i++;
+	}
 	pthread_mutex_destroy(&(data->printing));
+	pthread_mutex_destroy(&(data->meal_state));
 }
 
 void	check_status(t_data *data)
